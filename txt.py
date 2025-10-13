@@ -1,3 +1,0 @@
-#eu
-#pulamea 
-khgjgvj
