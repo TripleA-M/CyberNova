@@ -84,8 +84,8 @@ def failed_login():
         ts_obj = failed_logins[ip].get("timestamp")
         if ts_obj:
             ts = ts_obj.isoformat() + "Z" if isinstance(ts_obj, datetime) else str(ts_obj)
-    if not ts:
-        ts = datetime.utcnow().isoformat() + "Z"
+        if not ts:
+            ts = datetime.utcnow().isoformat() + "Z"
 
     with open("database.txt", "a") as f:
         f.write(f"{ts} - Failed login attempt - IP: {ip}, User-Agent: {user_agent}\n")
