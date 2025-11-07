@@ -28,6 +28,7 @@ failed_logins = {}
 # URL of the local Node.js relay that forwards messages to Discord.
 # Configure via env var DISCORD_PROXY_URL; default assumes server.js runs on port 3000.
 DISCORD_PROXY_URL = os.getenv("DISCORD_PROXY_URL", "http://localhost:3000/send-to-discord")
+DISCORD_NOTIFY_USERNAME = os.getenv("DISCORD_NOTIFY_USERNAME", "CyberNova Bot")
 
 
 def send_to_discord(username: str, message: str) -> None:
@@ -36,7 +37,7 @@ def send_to_discord(username: str, message: str) -> None:
     Does not raise on failure; logs errors so the main flow isn't blocked.
     """
     try:
-        payload = {"username": username, "message": message}
+        payload = {"username": username or DISCORD_NOTIFY_USERNAME, "message": message}
         resp = requests.post(DISCORD_PROXY_URL, json=payload, timeout=5)
         if resp.status_code >= 400:
             logging.error("Discord relay responded with %s: %s", resp.status_code, resp.text)
@@ -86,6 +87,12 @@ def index():
                 session["user_agent"] = user_agent
                 session["ip_address"] = ip_address
                 session.permanent = True
+                # Notify Discord about new user registration
+                ts = datetime.utcnow().isoformat() + "Z"
+                send_to_discord(
+                    DISCORD_NOTIFY_USERNAME,
+                    f"[Registration] @Admin New user registered\n⏰ {ts}\n📧 Email: {email}\n🌐 IP: {ip_address}\n🖥️ UA: {user_agent}"
+                )
                 return redirect("/dashboard")
         elif action == "login":
             user_hash = get_user(email)
@@ -148,6 +155,11 @@ def failed_login():
             f"🖥️ User-Agent: {user_agent}\n"
             f"---\n"
         )
+    # Notify Discord about failed login attempt
+    send_to_discord(
+        DISCORD_NOTIFY_USERNAME,
+        f"[Security] @Admin Failed login attempt\n⏰ {ts}\n🌐 IP: {ip}\n🖥️ UA: {user_agent}"
+    )
     return redirect(url_for("index", error="Wrong Password"))
 
 @app.route('/honeypot', methods=['POST'])
@@ -157,6 +169,16 @@ def honeypot():
     headers = request.headers
     threat_score = calculate_fingerprint_score(headers)
     logging.info(f"IP Address: {ip_address}, Geo Data: {geo_data}, Threat Score: {threat_score}")
+    # Notify Discord about honeypot hit
+    try:
+        ts = datetime.utcnow().isoformat() + "Z"
+        geo_summary = ", ".join([f"{k}:{v}" for k, v in (geo_data or {}).items()])
+        send_to_discord(
+            DISCORD_NOTIFY_USERNAME,
+            f"[Honeypot] @Admin Probe detected\n⏰ {ts}\n🌐 IP: {ip_address}\n📍 Geo: {geo_summary}\n🧮 Threat Score: {threat_score}"
+        )
+    except Exception:
+        logging.exception("Failed sending honeypot notification")
     return {
         "geo_data": geo_data,
         "threat_score": threat_score

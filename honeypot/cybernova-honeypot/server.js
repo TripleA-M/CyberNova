@@ -14,6 +14,7 @@ dotenvConfig({ path: rootEnvPath });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const ADMIN_ROLE_ID = process.env.ADMIN_ROLE_ID; // Optional: Discord Role ID to mention (e.g., Admin)
 
 // --- IMPORTANT ---
 // Store your secret Webhook URL as an environment variable.
@@ -45,10 +46,20 @@ app.post('/send-to-discord', async (req, res) => {
   }
 
   // Create the payload for the Discord Webhook
+  // Build content with optional Admin role mention
+  let content = message;
+  if (ADMIN_ROLE_ID) {
+    content = `<@&${ADMIN_ROLE_ID}> ${message}`;
+  }
+
   const discordPayload = {
     username: username, // You can customize the bot's name
     avatar_url: '', // You can add a URL to a custom avatar
-    content: message,
+    content,
+    // Ensure role mention is allowed if ADMIN_ROLE_ID is configured
+    ...(ADMIN_ROLE_ID
+      ? { allowed_mentions: { parse: [], roles: [ADMIN_ROLE_ID] } }
+      : {}),
   };
 
   try {
