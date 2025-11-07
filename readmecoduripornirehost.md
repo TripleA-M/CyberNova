@@ -12,3 +12,4 @@ pip install Flask
 
 pip install Flask request
 
+python app.py
