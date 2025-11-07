@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 ---
 ⏰ Data: 2025-11-07T16:48:27.587551Z
 ❌ Tip: Failed login attempt

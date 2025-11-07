@@ -20,10 +20,11 @@
             <label for="password">Parolă:</label>
             <input type="password" id="password" name="password" required>
 
-            <button type="submit">Autentificare</button>
-        {% if error %}
-            <div style="color: red; font-weight: bold;">{{ error }}</div>
-        {% endif %}
+            <button type="submit" name="action" value="login">Autentificare</button>
+            <button type="submit" name="action" value="register">Creare cont</button>
+            {% if error %}
+                <div style="color: red; font-weight: bold;">{{ error }}</div>
+            {% endif %}
         </form>
     </main>
     <footer>

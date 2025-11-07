@@ -3,6 +3,7 @@ import logging
 import os
 from datetime import timedelta, datetime
 import requests
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from geoip.geoip_utils import get_geo_data
 from scoring.scoring_utils import calculate_fingerprint_score
@@ -47,6 +48,23 @@ def send_to_discord(username: str, message: str) -> None:
 SUDO_EMAIL = "tripelA&M@gmail.com"
 SUDO_PASSWORD = "AndreiAntonio2xMarius"
 
+USERS_FILE = "users.txt"
+
+def save_user(email, password):
+    hashed = generate_password_hash(password)
+    with open(USERS_FILE, "a") as f:
+        f.write(f"{email},{hashed}\n")
+
+def get_user(email):
+    if not os.path.exists(USERS_FILE):
+        return None
+    with open(USERS_FILE) as f:
+        for line in f:
+            user_email, user_hash = line.strip().split(",", 1)
+            if user_email == email:
+                return user_hash
+    return None
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     error = request.args.get("error") or session.pop("error", None)
@@ -54,28 +72,34 @@ def index():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
+        action = request.form.get("action")
         user_agent = request.headers.get("User-Agent")
         ip_address = request.remote_addr
 
-        # Sudo login
-        if email == SUDO_EMAIL and password == SUDO_PASSWORD:
-            session.permanent = True
-            session["email"] = email
-            session["password"] = password
-            session["user_agent"] = user_agent
-            session["ip_address"] = ip_address
-            return redirect("/dashboard")
+        if action == "register":
+            if get_user(email):
+                error = "Email deja folosit!"
+            else:
+                save_user(email, password)
+                session["email"] = email
+                session["password"] = password
+                session["user_agent"] = user_agent
+                session["ip_address"] = ip_address
+                session.permanent = True
+                return redirect("/dashboard")
+        elif action == "login":
+            user_hash = get_user(email)
+            if user_hash and check_password_hash(user_hash, password):
+                session["email"] = email
+                session["password"] = password
+                session["user_agent"] = user_agent
+                session["ip_address"] = ip_address
+                session.permanent = True
+                return redirect("/dashboard")
+            else:
+                error = "Email sau parolă greșită!"
         else:
-            # Save failed login for 30 min
-            failed_logins[ip_address] = {
-                "user_agent": user_agent,
-                "timestamp": datetime.utcnow()
-            }
-            session["failed_ip"] = ip_address
-            session["failed_user_agent"] = user_agent
-            session.permanent = True
-            app.permanent_session_lifetime = timedelta(minutes=30)
-            return redirect(url_for("failed_login"))
+            error = "Acțiune necunoscută!"
 
     return render_template("index.html", error=error)
 
