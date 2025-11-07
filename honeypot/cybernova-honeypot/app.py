@@ -1,7 +1,9 @@
 from flask import Flask, request, render_template, redirect, session, url_for
 import logging
 import os
+import secrets
 from datetime import timedelta, datetime
+from dotenv import load_dotenv, find_dotenv
 
 from geoip.geoip_utils import get_geo_data
 from scoring.scoring_utils import calculate_fingerprint_score
@@ -9,13 +11,20 @@ from scoring.scoring_utils import calculate_fingerprint_score
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 GLOBAL_STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
+load_dotenv(find_dotenv())  # load environment variables from nearest .env if present
+
 app = Flask(
     __name__,
     static_folder=GLOBAL_STATIC_DIR,
     template_folder='templates'
 )
 
-app.secret_key = "supersecretkey"
+# Prefer FLASK_SECRET_KEY from environment; fall back to ephemeral dev key (not for production)
+_env_secret = os.getenv("FLASK_SECRET_KEY")
+if not _env_secret:
+    _env_secret = secrets.token_hex(32)
+    logging.warning("FLASK_SECRET_KEY not set; using a temporary in-memory key. Set it in a .env file or environment for production.")
+app.secret_key = _env_secret
 app.permanent_session_lifetime = timedelta(minutes=10)
 
 logging.basicConfig(level=logging.INFO)

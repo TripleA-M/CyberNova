@@ -28,6 +28,23 @@ To set up the project, clone the repository and install the required dependencie
 pip install -r requirements.txt
 ```
 
+## Configuration (Secret Key)
+This app uses Flask sessions and requires a secret key. Do NOT hardcode it.
+
+1) Create your local `.env` file from the example:
+
+```bash
+cp ../../.env.example ../../.env
+```
+
+2) Generate a secure key (PowerShell):
+
+```powershell
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+3) Put the generated value in `../../.env` as `FLASK_SECRET_KEY=...`.
+
 ## Usage
 Run the application using the following command:
 
