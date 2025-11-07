@@ -142,3 +142,16 @@ def honeypot():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
+
+    @app.route("/failed-login")
+def failed_login():
+    ip = session.get("failed_ip")
+    user_agent = session.get("failed_user_agent")
+    with open("database.txt", "a") as f:
+        f.write(f"Failed login attempt - IP: {ip}, User-Agent: {user_agent}\n")
+    # Redirect back to the main page and show "Wrong Password"
+    return redirect(url_for("index", error="Wrong Password"))
