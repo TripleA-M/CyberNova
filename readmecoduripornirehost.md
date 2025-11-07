@@ -18,5 +18,9 @@ honeypot\cybernova-honeypot -> app.py -> right click -> Reveal in File explorer 
 
 python app.py
 
+@app.before_first_request
+def setup():
+    ensure_sudo_user()
+
 
 

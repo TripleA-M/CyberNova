@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, session, url_for
+from flask import Flask, request, render_template, redirect, session, url_for, send_file
 import logging
 import os
 from datetime import timedelta, datetime
@@ -23,9 +23,11 @@ logging.basicConfig(level=logging.INFO)
 # Store failed login attempts in memory (for demo; use DB for production)
 failed_logins = {}
 
+SUDO_EMAIL = "tripelA&M@gmail.com"
+SUDO_PASSWORD = "AndreiAntonio2xMarius"
+
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # show error message if provided via query string or session
     error = request.args.get("error") or session.pop("error", None)
 
     if request.method == "POST":
@@ -34,8 +36,8 @@ def index():
         user_agent = request.headers.get("User-Agent")
         ip_address = request.remote_addr
 
-        # Demo: Accept only password "123456"
-        if password == "123456":
+        # Sudo login
+        if email == SUDO_EMAIL and password == SUDO_PASSWORD:
             session.permanent = True
             session["email"] = email
             session["password"] = password
@@ -52,12 +54,9 @@ def index():
             session["failed_user_agent"] = user_agent
             session.permanent = True
             app.permanent_session_lifetime = timedelta(minutes=30)
-            # redirect to failed-login endpoint which will redirect back to index with message
             return redirect(url_for("failed_login"))
 
     return render_template("index.html", error=error)
-
-
 
 @app.route("/dashboard")
 def dashboard():
@@ -65,12 +64,21 @@ def dashboard():
     password = session.get("password")
     user_agent = session.get("user_agent")
     # ip_address is stored but not displayed
-    if email and password:
+    if email == SUDO_EMAIL and password == SUDO_PASSWORD:
         return f"""
         <h2>Bine ai venit, {email}!</h2>
         <p>Parola ta: {password}</p>
         <p>User-Agent: {user_agent}</p>
         <p>Datele tale vor fi reținute 10 minute.</p>
+        <p><a href="/view-database">Vezi baza de date</a></p>
+        """
+    elif email and password:
+        return f"""
+        <h2>Bine ai venit, {email}!</h2>
+        <p>Parola ta: {password}</p>
+        <p>User-Agent: {user_agent}</p>
+        <p>Datele tale vor fi reținute 10 minute.</p>
+        <p>Nu ai permisiuni pentru a vedea baza de date.</p>
         """
     return redirect("/")
 
@@ -94,6 +102,19 @@ def honeypot():
         "geo_data": geo_data,
         "threat_score": threat_score
     }
+
+@app.route("/view-database")
+def view_database():
+    email = session.get("email")
+    if email == SUDO_EMAIL:
+        with open("database.txt", "r") as f:
+            content = f.read().replace("\n", "<br>")
+        return f"""
+        <h2>Conținutul bazei de date:</h2>
+        <div style="background:#f4f6fa;padding:15px;border-radius:8px;">{content}</div>
+        <p><a href="/dashboard">Înapoi la dashboard</a></p>
+        """
+    return redirect("/")
 
 if __name__ == "__main__":
     app.run(debug=True)
