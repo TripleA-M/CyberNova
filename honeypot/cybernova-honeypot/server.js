@@ -2,7 +2,15 @@
 import express from 'express';
 import fetch from 'node-fetch'; // For making requests to Discord
 import cors from 'cors'; // To allow requests from your frontend
-import "dotenv/config"; // Load environment variables
+import { config as dotenvConfig } from 'dotenv';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+// Load environment variables from the repo root `.env` regardless of CWD
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootEnvPath = path.resolve(__dirname, '../../.env');
+dotenvConfig({ path: rootEnvPath });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
