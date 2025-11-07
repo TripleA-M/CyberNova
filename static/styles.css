@@ -88,3 +88,52 @@ footer {
 .login-container button:hover {
     background: #222e50;
 }
+
+.gateway-events {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #f8fafc;
+    border: 1px solid #dbe2ef;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(34, 46, 80, 0.08);
+    padding: 25px 20px;
+}
+
+.gateway-events h3 {
+    color: #4062bb;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.gateway-events ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.gateway-events li {
+    background: #fff;
+    border: 1px solid #e0e6ed;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 4px rgba(34, 46, 80, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gateway-events .event-time {
+    color: #888;
+    font-size: 0.95em;
+}
+
+.gateway-events .event-status {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    font-weight: bold;
+    background: #4062bb;
+    color: #fff;
+    margin-left: 10px;
+}
