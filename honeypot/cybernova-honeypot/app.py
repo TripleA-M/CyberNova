@@ -25,9 +25,12 @@ logging.basicConfig(level=logging.INFO)
 failed_logins = {}
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 SUDO_EMAIL = "tripelA&M@gmail.com"
 SUDO_PASSWORD = "AndreiAntonio2xMarius"
 =======
+=======
+>>>>>>> Stashed changes
 # URL of the local Node.js relay that forwards messages to Discord.
 # Configure via env var DISCORD_PROXY_URL; default assumes server.js runs on port 3000.
 DISCORD_PROXY_URL = os.getenv("DISCORD_PROXY_URL", "http://localhost:3000/send-to-discord")
@@ -47,6 +50,9 @@ def send_to_discord(username: str, message: str) -> None:
             logging.info("Notified Discord relay successfully")
     except Exception as e:
         logging.exception("Failed to notify Discord relay: %s", e)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 @app.route("/", methods=["GET", "POST"])
@@ -120,6 +126,7 @@ def failed_login():
     line = f"{ts} - Failed login attempt - IP: {ip}, User-Agent: {user_agent}"
     with open("database.txt", "a") as f:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         f.write(
             f"---\n"
             f"⏰ Data: {ts}\n"
@@ -129,6 +136,8 @@ def failed_login():
             f"---\n"
         )
 =======
+=======
+>>>>>>> Stashed changes
         f.write(line + "\n")
 
     # Also push this event to Discord via the relay service
