@@ -53,13 +53,13 @@ USERS_FILE = "users.txt"
 
 def save_user(email, password):
     hashed = generate_password_hash(password)
-    with open(USERS_FILE, "a") as f:
+    with open(USERS_FILE, "a", encoding="utf-8") as f:
         f.write(f"{email},{hashed}\n")
 
 def get_user(email):
     if not os.path.exists(USERS_FILE):
         return None
-    with open(USERS_FILE) as f:
+    with open(USERS_FILE, encoding="utf-8", errors="replace") as f:
         for line in f:
             user_email, user_hash = line.strip().split(",", 1)
             if user_email == email:
@@ -102,7 +102,7 @@ def index():
                     DISCORD_NOTIFY_USERNAME,
                     f"[Security] @Admin Failed SUDO login\n⏰ {ts}\n📧 Email: {email}\n🌐 IP: {ip_address}\n🖥️ UA: {user_agent}"
                 )
-                with open("database.txt", "a") as f:
+                with open("database.txt", "a", encoding="utf-8") as f:
                     f.write(
                         f"---\n"
                         f"⏰ Data: {ts}\n"
@@ -153,7 +153,7 @@ def failed_login():
     if not ts:
         ts = datetime.utcnow().isoformat() + "Z"
 
-    with open("database.txt", "a") as f:
+    with open("database.txt", "a", encoding="utf-8") as f:
         f.write(
             f"---\n"
             f"⏰ Data: {ts}\n"
@@ -195,7 +195,7 @@ def honeypot():
 def view_database():
     email = session.get("email")
     if email == SUDO_EMAIL:
-        with open("database.txt", "r") as f:
+        with open("database.txt", "r", encoding="utf-8", errors="replace") as f:
             content = f.read().replace("\n", "<br>")
         return f"""
         <h2>Conținutul bazei de date:</h2>

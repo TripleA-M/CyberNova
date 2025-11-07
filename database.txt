@@ -1,3 +1,9 @@
 2025-11-07T16:43:19.635623Z - Failed login attempt - IP: 127.0.0.1, User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0
 2025-11-07T16:46:18.887689Z - Failed login attempt - IP: 127.0.0.1, User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0
 2025-11-07T16:48:32.260443Z - Failed login attempt - IP: 127.0.0.1, User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0
+---
+⏰ Data: 2025-11-07T20:35:47.020255Z
+❌ Tip: Failed login attempt
+🌐 IPweb: 127.0.0.1
+🖥️ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0
+---
