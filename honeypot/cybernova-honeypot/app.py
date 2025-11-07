@@ -5,7 +5,9 @@ from datetime import timedelta, datetime
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 try:
-    from dotenv import load_dotenv
+    import importlib
+    _dotenv = importlib.import_module("dotenv")
+    load_dotenv = getattr(_dotenv, "load_dotenv", lambda *args, **kwargs: False)
 except Exception:  # Allow running even if python-dotenv isn't installed yet
     def load_dotenv(*args, **kwargs):
         return False
