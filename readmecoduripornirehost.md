@@ -12,7 +12,8 @@ pip install Flask
 
 pip install Flask request
 
-python -m pip install reques
-ts
+python -m pip install requests
+
+honeypot\cybernova-honeypot -> app.py -> right click -> Reveal in File explorer -> copy destination -> VS Code Terminal -> CD destination 
 
 python app.py

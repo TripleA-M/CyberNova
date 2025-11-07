@@ -73,5 +73,4 @@ Logica Fingerprinting & Scoring: Dezvoltarea algoritmului de atribuire a scorulu
 
 Implementare Alertare: Setarea Discord Webhook-ului (sau Telegram Bot-ului) pentru a trimite mesajul structurat.
 
-Testare Finală: Testarea sistemului cu cereri cURL și simulări de bot.
-11
+Testare Finală: Testarea sistemului cu cereri cURL și simulări de bot.11
