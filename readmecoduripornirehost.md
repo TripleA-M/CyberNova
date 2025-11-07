@@ -1,5 +1,14 @@
 DO NOT MODIFY THIS MD
 
+run all Win: 
+
+pwsh -File .\run_all.ps1
+
+run all Mac:
+
+chmod +x ./run_all.sh
+./run_all.sh
+
 mkdir CYBERNOVA 
 
 CD CYBERNOVA
