@@ -86,18 +86,23 @@ def dashboard():
 def failed_login():
     ip = session.get("failed_ip")
     user_agent = session.get("failed_user_agent")
-    # try to use timestamp stored in memory, otherwise use current UTC time
     ts = None
     if ip and ip in failed_logins:
         ts_obj = failed_logins[ip].get("timestamp")
         if ts_obj:
             ts = ts_obj.isoformat() + "Z" if isinstance(ts_obj, datetime) else str(ts_obj)
-        if not ts:
-            ts = datetime.utcnow().isoformat() + "Z"
+    if not ts:
+        ts = datetime.utcnow().isoformat() + "Z"
 
     with open("database.txt", "a") as f:
-        f.write(f"{ts} - Failed login attempt - IP: {ip}, User-Agent: {user_agent}\n")
-    # Redirect back to the main page and show "Wrong Password"
+        f.write(
+            f"---\n"
+            f"⏰ Data: {ts}\n"
+            f"❌ Tip: Failed login attempt\n"
+            f"🌐 IPweb: {ip}\n"
+            f"🖥️ User-Agent: {user_agent}\n"
+            f"---\n"
+        )
     return redirect(url_for("index", error="Wrong Password"))
 
 @app.route('/honeypot', methods=['POST'])
@@ -117,10 +122,14 @@ def view_database():
     email = session.get("email")
     if email == SUDO_EMAIL:
         with open("database.txt", "r") as f:
-            content = f.read().replace("\n", "<br>")
+            entries = f.read().split("---\n")
+        formatted = ""
+        for entry in entries:
+            if entry.strip():
+                formatted += f'<div style="background:#fff;border-radius:8px;padding:15px;margin-bottom:15px;box-shadow:0 2px 8px #222e5020;">{entry.strip().replace(chr(10), "<br>")}</div>'
         return f"""
         <h2>Conținutul bazei de date:</h2>
-        <div style="background:#f4f6fa;padding:15px;border-radius:8px;">{content}</div>
+        {formatted}
         <p><a href="/dashboard">Înapoi la dashboard</a></p>
         """
     return redirect("/")
