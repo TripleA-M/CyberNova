@@ -1,0 +1,21 @@
+# Ignore environment variable files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Node dependencies
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+logs/
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
