@@ -2,6 +2,7 @@
 import express from 'express';
 import fetch from 'node-fetch'; // For making requests to Discord
 import cors from 'cors'; // To allow requests from your frontend
+import "dotenv/config"; // Load environment variables
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,7 +11,10 @@ const PORT = process.env.PORT || 3000;
 // Store your secret Webhook URL as an environment variable.
 // DO NOT hard-code it in your file like this for production.
 // Example: process.env.DISCORD_WEBHOOK_URL
-const DISCORD_WEBHOOK_URL = https://discord.com/api/webhooks/143629365451c4765877/gRFc_p-wj2BMU2-Ty8veSkKiH_CHrIxsFQBlXuVwsr_tE02XSnvBD7XbXJEJ1kM9ekSV;
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
+if (!DISCORD_WEBHOOK_URL) {
+  throw new Error("Missing DISCORD_WEBHOOK_URL environment variable");
+}
 
 // --- Middleware ---
 // 1. Allow Cross-Origin Requests (from your website)
