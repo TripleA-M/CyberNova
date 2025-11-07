@@ -25,6 +25,9 @@ failed_logins = {}
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # show error message if provided via query string or session
+    error = request.args.get("error") or session.pop("error", None)
+
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -49,9 +52,10 @@ def index():
             session["failed_user_agent"] = user_agent
             session.permanent = True
             app.permanent_session_lifetime = timedelta(minutes=30)
+            # redirect to failed-login endpoint which will redirect back to index with message
             return redirect(url_for("failed_login"))
 
-    return render_template("index.html")
+    return render_template("index.html", error=error)
 
 
 
@@ -76,12 +80,8 @@ def failed_login():
     user_agent = session.get("failed_user_agent")
     with open("database.txt", "a") as f:
         f.write(f"Failed login attempt - IP: {ip}, User-Agent: {user_agent}\n")
-    #return redirect("/")
-    return f"""<h2>Acces refuzat!</h2>
-    <p>Parola introdusă este greșită.</p>
-    <p>IP-ul tău și User-Agent-ul au fost reținute pentru 30 minute.</p>
-    <p>User-Agent: {user_agent}</p>
-    """
+    # Redirect back to the main page and show "Wrong Password"
+    return redirect(url_for("index", error="Wrong Password"))
 
 @app.route('/honeypot', methods=['POST'])
 def honeypot():

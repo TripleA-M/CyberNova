@@ -21,6 +21,9 @@
             <input type="password" id="password" name="password" required>
 
             <button type="submit">Autentificare</button>
+        {% if error %}
+            <div style="color: red; font-weight: bold;">{{ error }}</div>
+        {% endif %}
         </form>
     </main>
     <footer>
