@@ -44,6 +44,9 @@ def send_to_discord(username: str, message: str) -> None:
     except Exception as e:
         logging.exception("Failed to notify Discord relay: %s", e)
 
+SUDO_EMAIL = "tripelA&M@gmail.com"
+SUDO_PASSWORD = "AndreiAntonio2xMarius"
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     error = request.args.get("error") or session.pop("error", None)
@@ -140,14 +143,10 @@ def view_database():
     email = session.get("email")
     if email == SUDO_EMAIL:
         with open("database.txt", "r") as f:
-            entries = f.read().split("---\n")
-        formatted = ""
-        for entry in entries:
-            if entry.strip():
-                formatted += f'<div style="background:#fff;border-radius:8px;padding:15px;margin-bottom:15px;box-shadow:0 2px 8px #222e5020;">{entry.strip().replace(chr(10), "<br>")}</div>'
+            content = f.read().replace("\n", "<br>")
         return f"""
         <h2>Conținutul bazei de date:</h2>
-        {formatted}
+        <div style="background:#f4f6fa;padding:15px;border-radius:8px;">{content}</div>
         <p><a href="/dashboard">Înapoi la dashboard</a></p>
         """
     return redirect("/")
