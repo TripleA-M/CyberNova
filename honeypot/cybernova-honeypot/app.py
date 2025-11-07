@@ -27,9 +27,12 @@ failed_logins = {}
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 SUDO_EMAIL = "tripelA&M@gmail.com"
 SUDO_PASSWORD = "AndreiAntonio2xMarius"
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -55,6 +58,9 @@ def send_to_discord(username: str, message: str) -> None:
         logging.exception("Failed to notify Discord relay: %s", e)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -134,6 +140,7 @@ def failed_login():
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         f.write(
             f"---\n"
             f"⏰ Data: {ts}\n"
@@ -143,6 +150,8 @@ def failed_login():
             f"---\n"
         )
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
