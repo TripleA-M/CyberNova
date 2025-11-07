@@ -63,8 +63,8 @@ def send_to_discord(username: str, message: str) -> None:
     except Exception as e:
         logging.exception("Failed to notify Discord relay: %s", e)
 
-SUDO_EMAIL = os.getenv("SUDO_EMAIL", "admin@example.com")
-SUDO_PASSWORD = os.getenv("SUDO_PASSWORD", "change-me")
+SUDO_EMAIL = os.getenv("SUDO_EMAIL", "tripelA&M@gmail.com")
+SUDO_PASSWORD = os.getenv("SUDO_PASSWORD", "AndreiAntonio2xMarius")
 
 USERS_FILE = "users.txt"
 
