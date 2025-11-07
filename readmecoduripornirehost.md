@@ -20,3 +20,11 @@ python app.py
 
 
 
+Comenzi bot:
+(In doua terminale diferite)
+
+node honeypot/cybernova-honeypot/server.js
+
+python honeypot/cybernova-honeypot/app.py
+
+
