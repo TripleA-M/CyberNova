@@ -1,22 +1,12 @@
 # CyberNova
-Conceptul de Bază:
-Vei construi o aplicație web simplă care imită o pagină de autentificare (login). Scopul acesteia nu este să autentifice utilizatori, ci să funcționeze ca o capcană digitală.
+1. Obiectivul Proiectului
 
-Cum Funcționează:
+Proiectul CH2.0 este un Honeypot de Threat Intelligence conceput pentru a identifica, clasifica și analiza instrumentele automate de atac (credential stuffers, config scrapers, boți) prin simularea unei vulnerabilități API tentante. Scopul nu este furtul de date, ci colectarea de informații avansate despre atacator (fingerprinting).
 
-Un utilizator (sau un atacator) introduce un nume de utilizator și o parolă pe pagina ta falsă.
+2.Sistemul este împărțit în trei componente principale:
+frontend/Momeală                   Simplu HTML/CSS                      Servește ca o pagină inițială de login.
+Backend/Motorul Honeypot           Python (Flask/FastAPI)               Gestionează endpoint-urile API, analizează cererile,        
+                                                                         integrează API-urile externe și scrie log-urile.
 
-În loc să verifice dacă datele sunt corecte, sistemul tău va captura și salva următoarele informații:
-
-Numele de utilizator și parola introduse.
-
-Adresa IP a vizitatorului.
-
-User-Agent-ul (informații despre browser-ul și sistemul său de operare).
-
-Focalizarea pentru Concurs:
-Pentru acest hackathon, accentul principal nu este pe crearea unei pagini web complicate sau cu un design complex. Punctul central al proiectului tău este sistemul din spate, adică:
-
-Logging (Înregistrarea): Salvarea eficientă a datelor capturate într-un fișier.
-
-Alerting (Alertarea): Trimiterea unei notificări instantanee pe un canal de Discord de fiecare dată când cineva încearcă să se "autentifice".
+Alertare/Reporting                 Discord Webhook sau Telegram Bot      Notificare instantanee și structurată a evenimentelor de 
+                                                                         înaltă gravitate.
