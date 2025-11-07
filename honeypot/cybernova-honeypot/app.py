@@ -24,19 +24,6 @@ logging.basicConfig(level=logging.INFO)
 # Store failed login attempts in memory (for demo; use DB for production)
 failed_logins = {}
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-SUDO_EMAIL = "tripelA&M@gmail.com"
-SUDO_PASSWORD = "AndreiAntonio2xMarius"
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 # URL of the local Node.js relay that forwards messages to Discord.
 # Configure via env var DISCORD_PROXY_URL; default assumes server.js runs on port 3000.
 DISCORD_PROXY_URL = os.getenv("DISCORD_PROXY_URL", "http://localhost:3000/send-to-discord")
@@ -56,16 +43,6 @@ def send_to_discord(username: str, message: str) -> None:
             logging.info("Notified Discord relay successfully")
     except Exception as e:
         logging.exception("Failed to notify Discord relay: %s", e)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -135,12 +112,7 @@ def failed_login():
     if not ts:
         ts = datetime.utcnow().isoformat() + "Z"
 
-    line = f"{ts} - Failed login attempt - IP: {ip}, User-Agent: {user_agent}"
     with open("database.txt", "a") as f:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         f.write(
             f"---\n"
             f"⏰ Data: {ts}\n"
@@ -149,22 +121,6 @@ def failed_login():
             f"🖥️ User-Agent: {user_agent}\n"
             f"---\n"
         )
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-        f.write(line + "\n")
-
-    # Also push this event to Discord via the relay service
-    send_to_discord(
-        username="CyberNova Honeypot",
-        message=line,
-    )
-    # Redirect back to the main page and show "Wrong Password"
->>>>>>> Stashed changes
     return redirect(url_for("index", error="Wrong Password"))
 
 @app.route('/honeypot', methods=['POST'])
