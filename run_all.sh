@@ -34,26 +34,18 @@ fi
 # shellcheck disable=SC1091
 source .venv/bin/activate || warn "Nu pot activa .venv"
 
-# Instalări (tolerant la redundanță)
-info "Instalez Flask (dacă lipsește)..."
-python - <<'PY'
-try:
-    import flask  # noqa
-    print('flask-ok')
-except Exception:
-    print('install')
-PY
-if [ "$(python - <<'PY'
-try:
-    import flask
-    print('ok')
-except Exception:
-    print('no')
-PY
-)" != "ok" ]; then
-  pip install --upgrade pip
-  pip install Flask requests || true
+# Instalare/actualizare dependențe Python din requirements.txt (include python-dotenv)
+info "Instalez dependențele Python din requirements.txt..."
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+# Asigură dependențele Node (dotenv, express, node-fetch etc.) la rădăcina repo-ului
+cd "$REPO_ROOT"
+if [ ! -d node_modules ]; then
+  info "Instalez dependențele Node (npm install) în rădăcina repo-ului..."
+  npm install
 fi
+cd "$HONEYPOT_DIR"
 
 # Pornește Node în background
 info "Pornesc Node server.js în background..."

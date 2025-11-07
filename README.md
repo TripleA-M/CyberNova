@@ -74,3 +74,55 @@ Logica Fingerprinting & Scoring: Dezvoltarea algoritmului de atribuire a scorulu
 Implementare Alertare: Setarea Discord Webhook-ului (sau Telegram Bot-ului) pentru a trimite mesajul structurat.
 
 Testare Finală: Testarea sistemului cu cereri cURL și simulări de bot.11
+
+## Rulare locală (Windows / macOS / Linux)
+
+Proiectul include un script de automatizare pentru *Unix-like* (`run_all.sh`) și unul pentru Windows PowerShell (`run_all.ps1`). Acestea pornesc atât serverul Node (relay Discord) cât și aplicația Flask.
+
+### 1. Configurare variabile de mediu (.env)
+În rădăcina repo-ului (același nivel cu `package.json`) creează un fișier `.env` cu cel puțin:
+
+```
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/XXXXXXXX/AAAAAAAA
+SECRET_KEY=schimba_aceasta_cu_o_valoare_random
+# Opțional
+# PORT=3000
+# ADMIN_ROLE_ID=123456789012345678
+```
+
+Scripturile folosesc pachetele `dotenv` (Node) și `python-dotenv` (Python) pentru a încărca automat acest fișier.
+
+### 2. Rulare rapidă pe macOS / Linux
+
+```bash
+chmod +x run_all.sh
+./run_all.sh
+```
+
+Ce face scriptul:
+1. Creează și activează un mediu virtual Python (`.venv`) în `honeypot/cybernova-honeypot/` dacă lipsește.
+2. Instalează dependențele din `honeypot/cybernova-honeypot/requirements.txt` (inclusiv `python-dotenv`).
+3. Rulează `npm install` o singură dată la rădăcina repo-ului (pentru `dotenv`, `express`, etc.).
+4. Pornește `server.js` în background (relay Discord) folosind variabilele din `.env`.
+5. Lansează aplicația Flask (`app.py`).
+
+### 3. Rulare rapidă pe Windows (PowerShell)
+
+```powershell
+pwsh -File .\run_all.ps1
+```
+
+Asigură-te că ai instalat:
+- Python 3.11+ disponibil ca `python` sau `python3`
+- Node.js 18+
+
+### 4. Oprire
+Dacă rulezi `run_all.sh`, la `CTRL+C` scriptul va opri și procesul Node (cleanup). În PowerShell, oprește manual procesul Node dacă rămâne pornit (`Get-Process node | Stop-Process`).
+
+### 5. Depanare rapidă
+- `Missing DISCORD_WEBHOOK_URL`: verifică `.env` la rădăcină.
+- `ModuleNotFoundError: flask`: rulează din nou scriptul sau `pip install -r honeypot/cybernova-honeypot/requirements.txt` în `.venv`.
+- Port ocupat (3000 sau 5000): setează `PORT` în `.env` pentru Node și rulează Flask cu alt port manual dacă e nevoie.
+
+---
+Acestă secțiune a fost adăugată pentru a clarifica suportul `.env` și rularea pe macOS.
