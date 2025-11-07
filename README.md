@@ -75,4 +75,3 @@ Implementare Alertare: Setarea Discord Webhook-ului (sau Telegram Bot-ului) pent
 
 Testare Finală: Testarea sistemului cu cereri cURL și simulări de bot.
 
-Suntem gata să începem cu Pasul 1: Configurare Inițială (Alegerea Framework-ului și Structura Proiectului). Ce limbaj dorești să folosim: Python (Flask) sau altceva?
