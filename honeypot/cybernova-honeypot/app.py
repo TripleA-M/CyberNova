@@ -78,8 +78,17 @@ def dashboard():
 def failed_login():
     ip = session.get("failed_ip")
     user_agent = session.get("failed_user_agent")
+    # try to use timestamp stored in memory, otherwise use current UTC time
+    ts = None
+    if ip and ip in failed_logins:
+        ts_obj = failed_logins[ip].get("timestamp")
+        if ts_obj:
+            ts = ts_obj.isoformat() + "Z" if isinstance(ts_obj, datetime) else str(ts_obj)
+    if not ts:
+        ts = datetime.utcnow().isoformat() + "Z"
+
     with open("database.txt", "a") as f:
-        f.write(f"Failed login attempt - IP: {ip}, User-Agent: {user_agent}\n")
+        f.write(f"{ts} - Failed login attempt - IP: {ip}, User-Agent: {user_agent}\n")
     # Redirect back to the main page and show "Wrong Password"
     return redirect(url_for("index", error="Wrong Password"))
 
