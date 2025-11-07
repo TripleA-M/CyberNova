@@ -66,9 +66,14 @@ def get_user(email):
                 return user_hash
     return None
 
+ip_sessions = {}      # {ip: {"start": datetime, "blocked_until": datetime, "fail_count": int}}
+blocked_ips = set()   # IP-uri blocate
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     error = request.args.get("error") or session.pop("error", None)
+    now = datetime.utcnow()
+    ip_address = request.remote_addr
 
     if request.method == "POST":
         email = request.form["email"]
@@ -77,36 +82,38 @@ def index():
         user_agent = request.headers.get("User-Agent")
         ip_address = request.remote_addr
 
-        if action == "register":
-            if get_user(email):
-                error = "Email deja folosit!"
-            else:
-                save_user(email, password)
+        # Doar login SUDO
+        if action == "login":
+            if email == SUDO_EMAIL and password == SUDO_PASSWORD:
                 session["email"] = email
                 session["password"] = password
                 session["user_agent"] = user_agent
                 session["ip_address"] = ip_address
                 session.permanent = True
-                # Notify Discord about new user registration
                 ts = datetime.utcnow().isoformat() + "Z"
                 send_to_discord(
                     DISCORD_NOTIFY_USERNAME,
-                    f"[Registration] @Admin New user registered\n⏰ {ts}\n📧 Email: {email}\n🌐 IP: {ip_address}\n🖥️ UA: {user_agent}"
+                    f"[Login] @Admin SUDO login\n⏰ {ts}\n📧 Email: {email}\n🌐 IP: {ip_address}\n🖥️ UA: {user_agent}"
                 )
                 return redirect("/dashboard")
-        elif action == "login":
-            user_hash = get_user(email)
-            if user_hash and check_password_hash(user_hash, password):
-                session["email"] = email
-                session["password"] = password
-                session["user_agent"] = user_agent
-                session["ip_address"] = ip_address
-                session.permanent = True
-                return redirect("/dashboard")
             else:
+                ts = datetime.utcnow().isoformat() + "Z"
+                send_to_discord(
+                    DISCORD_NOTIFY_USERNAME,
+                    f"[Security] @Admin Failed SUDO login\n⏰ {ts}\n📧 Email: {email}\n🌐 IP: {ip_address}\n🖥️ UA: {user_agent}"
+                )
+                with open("database.txt", "a") as f:
+                    f.write(
+                        f"---\n"
+                        f"⏰ Data: {ts}\n"
+                        f"❌ Tip: Failed login attempt\n"
+                        f"🌐 IPweb: {ip_address}\n"
+                        f"🖥️ User-Agent: {user_agent}\n"
+                        f"---\n"
+                    )
                 error = "Email sau parolă greșită!"
         else:
-            error = "Acțiune necunoscută!"
+            error = "Doar autentificare SUDO este permisă momentan!"
 
     return render_template("index.html", error=error)
 
