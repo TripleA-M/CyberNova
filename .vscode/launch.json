@@ -11,13 +11,6 @@
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:8080",
             "webRoot": "${workspaceFolder}",
-            // Launch Opera GX instead of Chrome
-            "runtimeExecutable": "${env:LOCALAPPDATA}\\Programs\\Opera GX\\launcher.exe",
-            "runtimeArgs": [
-                "--remote-debugging-port=9222",
-                "--user-data-dir=${workspaceFolder}/.vscode/opera-profile"
-            ],
-            "port": 9222
         }
     ]
 }
