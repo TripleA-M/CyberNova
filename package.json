@@ -1,0 +1,25 @@
+{
+  "name": "cybernova",
+  "version": "1.0.0",
+  "description": "1. Obiectivul Proiectului",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TripleA-M/CyberNova.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/TripleA-M/CyberNova/issues"
+  },
+  "homepage": "https://github.com/TripleA-M/CyberNova#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2"
+  }
+}
