@@ -1,6 +1,7 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, session
 import logging
 import os
+from datetime import timedelta
 from geoip.geoip_utils import get_geo_data
 from scoring.scoring_utils import calculate_fingerprint_score
 
@@ -16,12 +17,35 @@ app = Flask(
     template_folder='templates'       # Keep templates local
 )
 
+app.secret_key = "supersecretkey"
+app.permanent_session_lifetime = timedelta(minutes=10)
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-@app.route('/')
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template('index.html')
+    if request.method == "POST":
+        session.permanent = True
+        session["email"] = request.form["email"]
+        session["password"] = request.form["password"]
+        session["user_agent"] = request.headers.get("User-Agent")
+        return redirect("/dashboard")
+    return render_template("index.html")
+
+@app.route("/dashboard")
+def dashboard():
+    email = session.get("email")
+    password = session.get("password")
+    user_agent = session.get("user_agent")
+    if email and password:
+        return f"""
+        <h2>Bine ai venit, {email}!</h2>
+        <p>Parola ta: {password}</p>
+        <p>User-Agent: {user_agent}</p>
+        <p>Datele tale vor fi reținute 10 minute.</p>
+        """
+    return redirect("/")
 
 @app.route('/honeypot', methods=['POST'])
 def honeypot():
