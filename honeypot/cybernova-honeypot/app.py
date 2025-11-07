@@ -53,6 +53,8 @@ def index():
 
     return render_template("index.html")
 
+
+
 @app.route("/dashboard")
 def dashboard():
     email = session.get("email")
@@ -72,8 +74,10 @@ def dashboard():
 def failed_login():
     ip = session.get("failed_ip")
     user_agent = session.get("failed_user_agent")
-    return f"""
-    <h2>Acces refuzat!</h2>
+    with open("database.txt", "a") as f:
+        f.write(f"Failed login attempt - IP: {ip}, User-Agent: {user_agent}\n")
+    #return redirect("/")
+    return f"""<h2>Acces refuzat!</h2>
     <p>Parola introdusă este greșită.</p>
     <p>IP-ul tău și User-Agent-ul au fost reținute pentru 30 minute.</p>
     <p>User-Agent: {user_agent}</p>
