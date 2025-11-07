@@ -41,15 +41,12 @@ py -3 -m venv .venv
 $activate = Join-Path '.venv' 'Scripts/Activate.ps1'
 if (Test-Path $activate) { . $activate } else { Write-Host "[run_all] WARN: Nu pot activa .venv (lipsește Scriptul de activare)." -ForegroundColor Yellow }
 
-# Echivalentul: pip install Flask
-pip install Flask
-
-# Echivalentul: pip install Flask request (poate fi redundant)
-# (nu oprim scriptul dacă pachetul 'request' nu există)
-try { pip install Flask request } catch { Write-Host "[run_all] WARN: 'pip install Flask request' a eșuat (poate pachet invalid)" -ForegroundColor Yellow }
-
-# Echivalentul: python -m pip install requests
-python -m pip install requests
+# Instalează dependențele din requirements.txt
+if (Test-Path (Join-Path $HoneypotDir 'requirements.txt')) {
+  pip install -r requirements.txt
+} else {
+  Write-Host "[run_all] WARN: Nu găsesc requirements.txt — sar peste instalare dependențe" -ForegroundColor Yellow
+}
 
 # Echivalentul: node server.js (în background ca să putem continua)
 Write-Host "[run_all] Pornesc Node server.js în background..." -ForegroundColor Green

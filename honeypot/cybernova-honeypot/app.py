@@ -4,11 +4,19 @@ import os
 from datetime import timedelta, datetime
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
+try:
+    from dotenv import load_dotenv
+except Exception:  # Allow running even if python-dotenv isn't installed yet
+    def load_dotenv(*args, **kwargs):
+        return False
+from markupsafe import escape, Markup
 
 from geoip.geoip_utils import get_geo_data
 from scoring.scoring_utils import calculate_fingerprint_score
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+# Load environment variables from repo root .env (if present)
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 GLOBAL_STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 app = Flask(
@@ -17,8 +25,15 @@ app = Flask(
     template_folder='templates'
 )
 
-app.secret_key = "supersecretkey"
+# Secrets and session configuration
+SECRET_KEY = os.getenv("SECRET_KEY") or os.urandom(24)
+app.secret_key = SECRET_KEY
 app.permanent_session_lifetime = timedelta(minutes=10)
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -46,8 +61,8 @@ def send_to_discord(username: str, message: str) -> None:
     except Exception as e:
         logging.exception("Failed to notify Discord relay: %s", e)
 
-SUDO_EMAIL = "tripelA&M@gmail.com"
-SUDO_PASSWORD = "AndreiAntonio2xMarius"
+SUDO_EMAIL = os.getenv("SUDO_EMAIL", "admin@example.com")
+SUDO_PASSWORD = os.getenv("SUDO_PASSWORD", "change-me")
 
 USERS_FILE = "users.txt"
 
@@ -86,7 +101,7 @@ def index():
         if action == "login":
             if email == SUDO_EMAIL and password == SUDO_PASSWORD:
                 session["email"] = email
-                session["password"] = password
+                session["is_admin"] = True
                 session["user_agent"] = user_agent
                 session["ip_address"] = ip_address
                 session.permanent = True
@@ -120,22 +135,20 @@ def index():
 @app.route("/dashboard")
 def dashboard():
     email = session.get("email")
-    password = session.get("password")
     user_agent = session.get("user_agent")
+    is_admin = session.get("is_admin", False)
     # ip_address is stored but not displayed
-    if email == SUDO_EMAIL and password == SUDO_PASSWORD:
+    if is_admin and email == SUDO_EMAIL:
         return f"""
-        <h2>Bine ai venit, {email}!</h2>
-        <p>Parola ta: {password}</p>
-        <p>User-Agent: {user_agent}</p>
+        <h2>Bine ai venit, {escape(email)}</h2>
+        <p>User-Agent: {escape(user_agent or '')}</p>
         <p>Datele tale vor fi reținute 10 minute.</p>
         <p><a href="/view-database">Vezi baza de date</a></p>
         """
-    elif email and password:
+    elif email:
         return f"""
-        <h2>Bine ai venit, {email}!</h2>
-        <p>Parola ta: {password}</p>
-        <p>User-Agent: {user_agent}</p>
+        <h2>Bine ai venit, {escape(email)}</h2>
+        <p>User-Agent: {escape(user_agent or '')}</p>
         <p>Datele tale vor fi reținute 10 minute.</p>
         <p>Nu ai permisiuni pentru a vedea baza de date.</p>
         """
@@ -193,13 +206,15 @@ def honeypot():
 
 @app.route("/view-database")
 def view_database():
+    is_admin = session.get("is_admin", False)
     email = session.get("email")
-    if email == SUDO_EMAIL:
+    if is_admin and email == SUDO_EMAIL:
         with open("database.txt", "r", encoding="utf-8", errors="replace") as f:
-            content = f.read().replace("\n", "<br>")
+            raw = f.read()
+        safe_content = Markup(escape(raw).replace("\n", "<br>"))
         return f"""
         <h2>Conținutul bazei de date:</h2>
-        <div style="background:#f4f6fa;padding:15px;border-radius:8px;">{content}</div>
+        <div style="background:#f4f6fa;padding:15px;border-radius:8px;">{safe_content}</div>
         <p><a href="/dashboard">Înapoi la dashboard</a></p>
         """
     return redirect("/")
