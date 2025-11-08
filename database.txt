@@ -73,3 +73,17 @@
 🌐 IPweb: 127.0.0.1
 🖥️ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0
 ---
+---
+⏰ Data: 2025-11-08T07:03:25.438636Z
+❌ Tip: Failed login attempt
+🌐 IPweb: 127.0.0.1
+🖥️ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0
+🧮 Threat Score: 10
+---
+---
+⏰ Data: 2025-11-08T07:04:21.264332Z
+❌ Tip: Failed login attempt
+🌐 IPweb: 127.0.0.1
+🖥️ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0
+🧮 Threat Score: 10
+---

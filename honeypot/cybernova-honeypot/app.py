@@ -115,9 +115,15 @@ def index():
                 return redirect("/dashboard")
             else:
                 ts = datetime.utcnow().isoformat() + "Z"
+                # Compute a basic threat score from current request headers
+                try:
+                    threat_score = calculate_fingerprint_score(request.headers)
+                except Exception:
+                    logging.exception("Failed to compute threat score")
+                    threat_score = 0
                 send_to_discord(
                     DISCORD_NOTIFY_USERNAME,
-                    f"[Security] @Admin Failed SUDO login\n⏰ {ts}\n📧 Email: {email}\n🌐 IP: {ip_address}\n🖥️ UA: {user_agent}"
+                    f"[Security] @Admin Failed SUDO login\n⏰ {ts}\n📧 Email: {email}\n🌐 IP: {ip_address}\n🖥️ UA: {user_agent}\n🧮 Threat Score: {threat_score}"
                 )
                 with open("database.txt", "a", encoding="utf-8") as f:
                     f.write(
@@ -126,6 +132,7 @@ def index():
                         f"❌ Tip: Failed login attempt\n"
                         f"🌐 IPweb: {ip_address}\n"
                         f"🖥️ User-Agent: {user_agent}\n"
+                        f"🧮 Threat Score: {threat_score}\n"
                         f"---\n"
                     )
                 error = "Email sau parolă greșită!"
@@ -168,6 +175,13 @@ def failed_login():
     if not ts:
         ts = datetime.utcnow().isoformat() + "Z"
 
+    # Compute a basic threat score from the current request headers
+    try:
+        threat_score = calculate_fingerprint_score(request.headers)
+    except Exception:
+        logging.exception("Failed to compute threat score")
+        threat_score = 0
+
     with open("database.txt", "a", encoding="utf-8") as f:
         f.write(
             f"---\n"
@@ -175,12 +189,13 @@ def failed_login():
             f"❌ Tip: Failed login attempt\n"
             f"🌐 IPweb: {ip}\n"
             f"🖥️ User-Agent: {user_agent}\n"
+            f"🧮 Threat Score: {threat_score}\n"
             f"---\n"
         )
     # Notify Discord about failed login attempt
     send_to_discord(
         DISCORD_NOTIFY_USERNAME,
-        f"[Security] @Admin Failed login attempt\n⏰ {ts}\n🌐 IP: {ip}\n🖥️ UA: {user_agent}"
+        f"[Security] @Admin Failed login attempt\n⏰ {ts}\n🌐 IP: {ip}\n🖥️ UA: {user_agent}\n🧮 Threat Score: {threat_score}"
     )
     return redirect(url_for("index", error="Wrong Password"))
 
@@ -191,6 +206,22 @@ def honeypot():
     headers = request.headers
     threat_score = calculate_fingerprint_score(headers)
     logging.info(f"IP Address: {ip_address}, Geo Data: {geo_data}, Threat Score: {threat_score}")
+    # Persist honeypot hit to local database with consistent format
+    try:
+        ts = datetime.utcnow().isoformat() + "Z"
+        user_agent = request.headers.get("User-Agent")
+        with open("database.txt", "a", encoding="utf-8") as f:
+            f.write(
+                f"---\n"
+                f"⏰ Data: {ts}\n"
+                f"❌ Tip: Honeypot hit\n"
+                f"🌐 IPweb: {ip_address}\n"
+                f"🖥️ User-Agent: {user_agent}\n"
+                f"🧮 Threat Score: {threat_score}\n"
+                f"---\n"
+            )
+    except Exception:
+        logging.exception("Failed to persist honeypot hit to database.txt")
     # Notify Discord about honeypot hit
     try:
         ts = datetime.utcnow().isoformat() + "Z"
