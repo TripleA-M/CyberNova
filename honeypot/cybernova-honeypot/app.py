@@ -8,7 +8,7 @@ try:
     import importlib
     _dotenv = importlib.import_module("dotenv")
     load_dotenv = getattr(_dotenv, "load_dotenv", lambda *args, **kwargs: False)
-except Exception:  # Allow running even if python-dotenv isn't installed yet
+except Exception:
     def load_dotenv(*args, **kwargs):
         return False
 from markupsafe import escape, Markup
@@ -17,7 +17,6 @@ from geoip.geoip_utils import get_geo_data
 from scoring.scoring_utils import calculate_fingerprint_score
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-# Load environment variables from repo root .env (if present)
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 GLOBAL_STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
@@ -27,7 +26,6 @@ app = Flask(
     template_folder='templates'
 )
 
-# Secrets and session configuration
 SECRET_KEY = os.getenv("SECRET_KEY") or os.urandom(24)
 app.secret_key = SECRET_KEY
 app.permanent_session_lifetime = timedelta(minutes=10)
@@ -39,20 +37,14 @@ app.config.update(
 
 logging.basicConfig(level=logging.INFO)
 
-# Store failed login attempts in memory (for demo; use DB for production)
 failed_logins = {}
 
-# URL of the local Node.js relay that forwards messages to Discord.
-# Configure via env var DISCORD_PROXY_URL; default assumes server.js runs on port 3000.
 DISCORD_PROXY_URL = os.getenv("DISCORD_PROXY_URL", "http://localhost:3000/send-to-discord")
 DISCORD_NOTIFY_USERNAME = os.getenv("DISCORD_NOTIFY_USERNAME", "CyberNova Bot")
 
 
 def send_to_discord(username: str, message: str) -> None:
-    """Best-effort notify the Discord relay service.
-
-    Does not raise on failure; logs errors so the main flow isn't blocked.
-    """
+    """Notify the Discord relay service (best effort)."""
     try:
         payload = {"username": username or DISCORD_NOTIFY_USERNAME, "message": message}
         resp = requests.post(DISCORD_PROXY_URL, json=payload, timeout=5)
@@ -83,8 +75,8 @@ def get_user(email):
                 return user_hash
     return None
 
-ip_sessions = {}      # {ip: {"start": datetime, "blocked_until": datetime, "fail_count": int}}
-blocked_ips = set()   # IP-uri blocate
+ip_sessions = {}
+blocked_ips = set()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -99,7 +91,6 @@ def index():
         user_agent = request.headers.get("User-Agent")
         ip_address = request.remote_addr
 
-        # Doar login SUDO
         if action == "login":
             if email == SUDO_EMAIL and password == SUDO_PASSWORD:
                 session["email"] = email
@@ -115,7 +106,6 @@ def index():
                 return redirect("/dashboard")
             else:
                 ts = datetime.utcnow().isoformat() + "Z"
-                # Compute a basic threat score from current request headers
                 try:
                     threat_score = calculate_fingerprint_score(request.headers)
                 except Exception:
@@ -146,7 +136,6 @@ def dashboard():
     email = session.get("email")
     user_agent = session.get("user_agent")
     is_admin = session.get("is_admin", False)
-    # ip_address is stored but not displayed
     if is_admin and email == SUDO_EMAIL:
         return f"""
         <h2>Bine ai venit, {escape(email)}</h2>
@@ -175,7 +164,6 @@ def failed_login():
     if not ts:
         ts = datetime.utcnow().isoformat() + "Z"
 
-    # Compute a basic threat score from the current request headers
     try:
         threat_score = calculate_fingerprint_score(request.headers)
     except Exception:
@@ -192,7 +180,6 @@ def failed_login():
             f"🧮 Threat Score: {threat_score}\n"
             f"---\n"
         )
-    # Notify Discord about failed login attempt
     send_to_discord(
         DISCORD_NOTIFY_USERNAME,
         f"[Security] @Admin Failed login attempt\n⏰ {ts}\n🌐 IP: {ip}\n🖥️ UA: {user_agent}\n🧮 Threat Score: {threat_score}"
@@ -206,7 +193,6 @@ def honeypot():
     headers = request.headers
     threat_score = calculate_fingerprint_score(headers)
     logging.info(f"IP Address: {ip_address}, Geo Data: {geo_data}, Threat Score: {threat_score}")
-    # Persist honeypot hit to local database with consistent format
     try:
         ts = datetime.utcnow().isoformat() + "Z"
         user_agent = request.headers.get("User-Agent")
@@ -222,7 +208,6 @@ def honeypot():
             )
     except Exception:
         logging.exception("Failed to persist honeypot hit to database.txt")
-    # Notify Discord about honeypot hit
     try:
         ts = datetime.utcnow().isoformat() + "Z"
         geo_summary = ", ".join([f"{k}:{v}" for k, v in (geo_data or {}).items()])

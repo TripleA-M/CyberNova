@@ -1,12 +1,10 @@
-// Import required packages
 import express from 'express';
-import fetch from 'node-fetch'; // For making requests to Discord
-import cors from 'cors'; // To allow requests from your frontend
+import fetch from 'node-fetch';
+import cors from 'cors';
 import { config as dotenvConfig } from 'dotenv';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
-// Load environment variables from the repo root `.env` regardless of CWD
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootEnvPath = path.resolve(__dirname, '../../.env');
@@ -14,30 +12,20 @@ dotenvConfig({ path: rootEnvPath });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_ROLE_ID = process.env.ADMIN_ROLE_ID; // Optional: Discord Role ID to mention (e.g., Admin)
+const ADMIN_ROLE_ID = process.env.ADMIN_ROLE_ID;
 
-// --- IMPORTANT ---
-// Store your secret Webhook URL as an environment variable.
-// DO NOT hard-code it in your file like this for production.
-// Example: process.env.DISCORD_WEBHOOK_URL
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 if (!DISCORD_WEBHOOK_URL) {
   throw new Error("Missing DISCORD_WEBHOOK_URL environment variable");
 }
 
-// --- Middleware ---
-// 1. Allow Cross-Origin Requests (from your website)
 app.use(cors());
-// 2. Parse JSON bodies (from your website's fetch request)
 app.use(express.json());
 
-// --- Routes ---
-// 1. A simple test route
 app.get('/', (req, res) => {
   res.send('Backend server is running!');
 });
 
-// 2. The main endpoint to receive messages from your frontend
 app.post('/send-to-discord', async (req, res) => {
   const { username, message } = req.body;
 
@@ -45,25 +33,21 @@ app.post('/send-to-discord', async (req, res) => {
     return res.status(400).json({ error: 'Username and message are required.' });
   }
 
-  // Create the payload for the Discord Webhook
-  // Build content with optional Admin role mention
   let content = message;
   if (ADMIN_ROLE_ID) {
     content = `<@&${ADMIN_ROLE_ID}> ${message}`;
   }
 
   const discordPayload = {
-    username: username, // You can customize the bot's name
-    avatar_url: '', // You can add a URL to a custom avatar
+    username: username,
+    avatar_url: '',
     content,
-    // Ensure role mention is allowed if ADMIN_ROLE_ID is configured
     ...(ADMIN_ROLE_ID
       ? { allowed_mentions: { parse: [], roles: [ADMIN_ROLE_ID] } }
       : {}),
   };
 
   try {
-    // Send the POST request to Discord
     const response = await fetch(DISCORD_WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -73,10 +57,8 @@ app.post('/send-to-discord', async (req, res) => {
     });
 
     if (response.ok) {
-      // Discord accepted the message
       res.status(200).json({ success: true, message: 'Message sent to Discord!' });
     } else {
-      // Discord returned an error
       console.error('Discord API Error:', await response.text());
       res.status(500).json({ error: 'Failed to send message to Discord.' });
     }
@@ -86,7 +68,6 @@ app.post('/send-to-discord', async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
   console.log('Remember to replace the DISCORD_WEBHOOK_URL with your secret URL.');

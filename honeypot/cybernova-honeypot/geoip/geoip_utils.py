@@ -7,6 +7,5 @@ def get_geo_data(ip_address):
         if response.status_code == 200:
             return response.json()
     except Exception:
-        # Fail closed and let caller handle None
         pass
     return None
