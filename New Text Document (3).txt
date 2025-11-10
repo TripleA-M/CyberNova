@@ -1,0 +1,91 @@
+## Pornire Rapidă CyberNova (fără căi hardcodate)
+
+### 1. Clonare
+```bash
+git clone https://github.com/TripleA-M/CyberNova.git
+cd CyberNova
+```
+
+### 2. Mediu Python (Windows / macOS / Linux)
+Creare mediu:
+```bash
+# Windows
+py -3 -m venv .venv
+# macOS/Linux
+python3 -m venv .venv
+```
+Activare:
+```bash
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+# macOS/Linux
+source .venv/bin/activate
+```
+
+Instalare dependențe:
+```bash
+pip install -r honeypot/cybernova-honeypot/requirements.txt
+```
+Sau minim (dacă fișierul lipsește):
+```bash
+pip install Flask requests
+```
+
+### 3. Variabile de mediu (opțional)
+În fișier `.env` din rădăcina proiectului:
+```
+DISCORD_WEBHOOK_URL=URL_WEBHOOK_SECRET
+PORT=3000
+ADMIN_ROLE_ID=1234567890
+DISCORD_PROXY_URL=http://localhost:3000/send-to-discord
+```
+
+### 4. Pornire servicii (automat)
+```powershell
+pwsh -File ./start.ps1
+```
+Scriptul:
+- Creează venv dacă lipsește
+- Activează venv
+- Instalează dependențe
+- Încarcă `.env`
+- Pornește `server.js` (Node)
+- Pornește `app.py` (Flask)
+
+### 5. Pornire manuală (două terminale)
+Terminal 1 (Node):
+```bash
+node honeypot/cybernova-honeypot/server.js
+```
+Terminal 2 (Python):
+```bash
+python honeypot/cybernova-honeypot/app.py
+```
+
+### 6. Alternative prin npm scripts
+```bash
+npm run node-relay   # pornește server.js
+npm run python-app   # pornește Flask
+npm run dev          # ambele (simplu)
+```
+
+### 7. De ce nu mai trebuie căi copiate
+Aplicația rezolvă fișierele (`users.txt`, `database.txt`) relativ la locația codului, nu la directorul curent. Astfel nu mai contează de unde rulezi comenzile.
+
+### 8. Curățare / reset
+```bash
+Remove-Item -Recurse -Force .venv   # Windows PowerShell
+rm -rf .venv                        # macOS/Linux
+```
+Recreezi apoi venv și reinstalezi dependențele.
+
+### 9. Probleme comune
+- Eroare DISCORD_WEBHOOK_URL: adaugă variabila în `.env`
+- Port ocupat: schimbă `PORT` în `.env`
+- Module lipsă: rulează `pip install -r requirements.txt`
+
+### 10. Test rapid
+Accesează în browser: `http://localhost:5000/` (Flask) și `http://localhost:3000/` (Node relay)
+
+---
+Acest ghid elimină pașii manuali inutili și face rularea reproductibilă și rapidă.

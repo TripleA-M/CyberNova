@@ -1,0 +1,10 @@
+cd C:\Users\anton\Documents\GitHub\CyberNova\honeypot\cybernova-honeypot
+py -3 -m venv .venv
+.venv\Scripts\activate
+pip install Flask
+pip install Flask request
+python -m pip install requests
+node server.js
+
+cd C:\Users\anton\Documents\GitHub\CyberNova
+python honeypot/cybernova-honeypot/app.py
